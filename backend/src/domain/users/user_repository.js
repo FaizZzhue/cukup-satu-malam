@@ -1,0 +1,40 @@
+const User = require('./user_model');
+const { admin, db } = require('../../config/firebase');
+
+async function getUserById(uid) {
+    const userDoc = await db.collection('users').doc(uid).get();
+    if (!userDoc.exists) {
+        throw new Error('User not found');
+    }
+    return User.fromFirebase(userDoc);
+}
+
+async function createUser(user, uid) {
+    await db.collection('users').doc(uid).set({
+        nama_lengkap: user.nama_lengkap,
+        program_studi: user.program_studi,
+        semester: user.semester,
+        tujuan_karir: user.tujuan_karir || "",
+        opsional_karir: user.opsional_karir || [],
+        karakteristik: user.karakteristik || "",
+        deskripsi: user.deskripsi || "",
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+        updatedAt: admin.firestore.FieldValue.serverTimestamp()
+    });
+}
+
+async function updateUser(newUser, uid) {
+    const user = await getUserById(uid);
+    await db.collection('users').doc(uid).update({
+        nama_lengkap: newUser.nama_lengkap || user.nama_lengkap,
+        program_studi: newUser.program_studi || user.program_studi,
+        semester: newUser.semester || user.semester,
+        tujuan_karir: newUser.tujuan_karir || user.tujuan_karir,
+        opsional_karir: newUser.opsional_karir || user.opsional_karir,
+        karakteristik: newUser.karakteristik || user.karakteristik,
+        deskripsi: newUser.deskripsi || user.deskripsi,
+        updatedAt: admin.firestore.FieldValue.serverTimestamp()
+    });
+}
+
+module.exports = { getUserById, createUser, updateUser };
