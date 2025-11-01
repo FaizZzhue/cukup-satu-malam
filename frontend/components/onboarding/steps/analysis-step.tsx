@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react"
 import { motion } from "framer-motion"
 import { Brain, Loader2, Target, TrendingUp, GraduationCap } from "lucide-react"
+import { auth } from "../../../firebase"
 
 interface AnalysisStepProps {
   name: string
@@ -36,8 +37,19 @@ export default function AnalysisStep({
     const analyzeWithAI = async () => {
       setLoading(true)
 
-      // Simulasi delay AI call (ganti nanti dengan API real)
-      await new Promise((r) => setTimeout(r, 2200))
+      const response = await fetch(`http://localhost:3001/api/users/${auth.currentUser?.uid}`, {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${await auth.currentUser?.getIdToken()}`,
+        },
+      });
+
+      const userData = await response.json();
+
+      name = userData.nama_lengkap;
+      major = userData.program_studi;
+      semester = userData.semester;
+      goals = [userData.tujuan_karir, ...(userData.opsional_karir || [])];
 
       // Dummy hasil AI berdasarkan input user
       const mock = {

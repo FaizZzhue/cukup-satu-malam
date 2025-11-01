@@ -4,6 +4,7 @@ import { useState } from "react"
 import { AnimatePresence } from "framer-motion"
 import { ArrowLeft, ArrowRight, CheckCircle } from "lucide-react"
 import { useRouter } from "next/navigation"
+import { auth } from "../../../firebase"
 
 import ProgressIndicator from "./progress-indicator"
 import NameStep from "./name-step"
@@ -23,9 +24,101 @@ export default function OnboardingFlow() {
   const [goals, setGoals] = useState([""])
   const [customRoadmap, setCustomRoadmap] = useState("")
 
-  const nextStep = () => setStep((prev) => Math.min(prev + 1, 6))
+  const nextStep = async () => {
+    const idToken = await auth.currentUser?.getIdToken();
+
+    const response = await fetch(`http://localhost:3001/api/users/${auth.currentUser?.uid}`, {
+      headers: {
+        Authorization: `Bearer ${idToken}`,
+      },
+    });
+
+    if (response.ok) {
+      var tempStep = 1;
+      const userData = await response.json();
+      if (userData.name) {
+        tempStep += 1;
+      }
+      if (userData.program_studi) {
+        tempStep += 1;
+      }
+      if (userData.semester) {
+        tempStep += 2;
+      }
+      setStep(tempStep);
+    }
+
+    if (step === 3) {
+      console.log("Submitting user data");
+      try {
+        const response = await fetch(`http://localhost:3001/api/users`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${idToken}`,
+          },
+          body: JSON.stringify({
+            nama_lengkap: name,
+            program_studi: major,
+            semester
+          }),
+        });
+      } catch (error) {
+        console.error("Error submitting user data:", error);
+      }
+    }
+    else if (step === 4) {
+      const response = await fetch (`http://localhost:3001/api/gemini/analyze-mini-quiz`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${idToken}`,
+        },
+        body: JSON.stringify({
+          quizResponse: assessment
+        }),
+      })
+    }
+    else if (step === 5) {
+      console.log(goals);
+      const response = await fetch(`http://localhost:3001/api/users/${auth.currentUser?.uid}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${idToken}`,
+        },
+        body: JSON.stringify({
+          tujuan_karir: goals[0],
+          opsional_karir: goals.slice(1),
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+      }
+    }
+    setStep((prev) => Math.min(prev + 1, 6))
+  }
   const prevStep = () => setStep((prev) => Math.max(prev - 1, 1))
-  const finish = () => router.push("/dashboard")
+  const finish = async () => {
+    const idToken = await auth.currentUser?.getIdToken();
+
+    const response = await fetch(`http://localhost:3001/api/users/${auth.currentUser?.uid}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${idToken}`,
+        },
+        body: JSON.stringify({
+          nama_lengkap: name,
+          program_studi: major,
+          semester,
+          tujuan_karir: goals[0],
+          opsional_karir: goals.slice(1),
+        }),
+      })
+    router.push("/dashboard")
+  }
 
   return (
     <div

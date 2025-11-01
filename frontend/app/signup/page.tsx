@@ -1,22 +1,51 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { ArrowLeftIcon } from "lucide-react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
+import { auth } from "../../firebase"
+import { createUserWithEmailAndPassword } from "firebase/auth"
 
 
 export default function SignUpPage() {
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
     const [message, setMessage] = useState ("")
+    const router = useRouter()
 
-    const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
+    useEffect(() => {
+        if (auth.currentUser) {
+            router.push("/onboarding")
+        }
+    }, [])
 
-    if (email === "student@example.com" && password === "123456") {
-        setMessage("Login successful! Welcome Student 🎓")
-    } else {
-        setMessage("Invalid email or password")
+    const handleSubmit =async  (e: React.FormEvent) => {
+        e.preventDefault()
+
+        if (email.trim() === "" && password.trim() === "") {
+            setMessage("Please fill in all fields")
+            return
+        } else {
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+            const idToken = await auth.currentUser?.getIdToken();
+
+            const response = await fetch('http://localhost:3001/api/auth/verify', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ idToken }),
+            });
+
+            if (response.ok) {
+                setMessage("Sign up successful! Redirecting...")
+                setTimeout(() => {
+                    router.push("/onboarding")
+                }, 1000)
+            } else {
+                setMessage("Sign up failed")
+            }
         }
     }
 
