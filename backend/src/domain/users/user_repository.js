@@ -1,5 +1,5 @@
 const User = require('./user_model');
-const { db } = require('../../config/firebase');
+const { admin, db } = require('../../config/firebase');
 
 async function getUserById(uid) {
     const userDoc = await db.collection('users').doc(uid).get();
@@ -17,7 +17,9 @@ async function createUser(user, uid) {
         tujuan_karir: user.tujuan_karir || "",
         opsional_karir: user.opsional_karir || [],
         karakteristik: user.karakteristik || "",
-        deskripsi: user.deskripsi || ""
+        deskripsi: user.deskripsi || "",
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+        updatedAt: admin.firestore.FieldValue.serverTimestamp()
     });
 }
 
@@ -30,7 +32,8 @@ async function updateUser(newUser, uid) {
         tujuan_karir: newUser.tujuan_karir || user.tujuan_karir,
         opsional_karir: newUser.opsional_karir || user.opsional_karir,
         karakteristik: newUser.karakteristik || user.karakteristik,
-        deskripsi: newUser.deskripsi || user.deskripsi
+        deskripsi: newUser.deskripsi || user.deskripsi,
+        updatedAt: admin.firestore.FieldValue.serverTimestamp()
     });
 }
 

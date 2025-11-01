@@ -1,4 +1,4 @@
-const { admin } = require('../config/db');
+const { admin } = require('../config/firebase');
 
 async function authenticate(req, res, next) {
   try {

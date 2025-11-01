@@ -1,5 +1,5 @@
 class User {
-    constructor(uid, nama_lengkap, program_studi, semester, tujuan_karir, opsional_karir, karakteristik, deskripsi ) {
+    constructor(uid, nama_lengkap, program_studi, semester, tujuan_karir, opsional_karir, karakteristik, deskripsi, createdAt, updatedAt ) {
         this.uid = uid;
         this.nama_lengkap = nama_lengkap;
         this.program_studi = program_studi;
@@ -8,6 +8,8 @@ class User {
         this.opsional_karir = opsional_karir;
         this.karakteristik = karakteristik;
         this.deskripsi = deskripsi;
+        this.createdAt = createdAt || new Date();
+        this.updatedAt = updatedAt || new Date();
     }
 
     static fromFirebase(userRecord) {
@@ -19,7 +21,9 @@ class User {
             userRecord.tujuan_karir || null,
             userRecord.opsional_karir || null,
             userRecord.karakteristik || null,
-            userRecord.deskripsi || null
+            userRecord.deskripsi || null,
+            userRecord.createdAt ? userRecord.createdAt.toDate() : new Date(),
+            userRecord.updatedAt ? userRecord.updatedAt.toDate() : new Date()
         );
     }
 }
