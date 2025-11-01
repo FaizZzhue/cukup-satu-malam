@@ -1,19 +1,19 @@
 const Roadmap = require('./roadmap_model');
 const { db } = require('../../config/firebase');
 
-async function getRoadmapById(id) {
-    const roadmapDoc = await db.collection('roadmaps').doc(id).get();
+async function getRoadmapById(uid) {
+    const roadmapDoc = await db.collection('roadmaps').doc(uid).get();
     return Roadmap.fromFirebase(roadmapDoc);
 }
 
 async function createRoadmap(roadmapData, uid) {
-    const roadmapRef = await db.collection('roadmaps').doc(uid).set(roadmapData);
-    return Roadmap.fromFirebase({ id: uid, ...roadmapData });
+    await db.collection('roadmaps').doc(uid).set({ roadmapDetails: roadmapData});
+    return await getRoadmapById(uid);
 }
 
 async function updateRoadmap(roadmapData, uid) {
     await db.collection('roadmaps').doc(uid).update(roadmapData);
-    const updatedDoc = await db.collection('roadmaps').doc(id).get();
+    const updatedDoc = await db.collection('roadmaps').doc(uid).get();
     return Roadmap.fromFirebase(updatedDoc);
 }
 

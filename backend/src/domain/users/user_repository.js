@@ -6,7 +6,7 @@ async function getUserById(uid) {
     if (!userDoc.exists) {
         throw new Error('User not found');
     }
-    return User.fromFirebase(userDoc.data());
+    return User.fromFirebase(userDoc);
 }
 
 async function createUser(user, uid) {

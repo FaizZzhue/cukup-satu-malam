@@ -12,9 +12,11 @@ class User {
         this.updatedAt = updatedAt || new Date();
     }
 
-    static fromFirebase(userRecord) {
+    static fromFirebase(userDoc) {
+        const uid = userDoc.id;
+        const userRecord = userDoc.data() || {};
         return new User(
-            userRecord.uid,
+            uid,
             userRecord.nama_lengkap || null,
             userRecord.program_studi || null,
             userRecord.semester || null,

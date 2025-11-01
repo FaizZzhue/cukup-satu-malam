@@ -2,7 +2,7 @@ const userService = require('./user_service');
 
 async function getUserById(req, res) {
     try {
-        const uid = req.user.uid;
+        const uid = req.params.uid;
         const user = await userService.getUserById(uid);
         if (!user) {
             return res.status(404).json({ error: 'User not found' });

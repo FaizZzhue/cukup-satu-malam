@@ -8,9 +8,8 @@ async function getRoadmapById(req, res) {
 
 async function createRoadmap(req, res) {
     try {
-        const uid = req.user.id;
-        const roadmapData = req.body;
-        const newRoadmap = await roadmapService.createRoadmap(roadmapData, uid);
+        const uid = req.user.uid;
+        const newRoadmap = await roadmapService.createRoadmap(uid);
         res.status(201).json(newRoadmap);
     } catch (error) {
         console.error('Error creating roadmap:', error);
@@ -21,8 +20,8 @@ async function createRoadmap(req, res) {
 async function updateRoadmap(req, res) {
     try {
         const uid = req.user.id;
-        const roadmapData = req.body;
-        const updatedRoadmap = await roadmapService.updateRoadmap(roadmapData, uid);
+        const roadmapDetails = req.body;
+        const updatedRoadmap = await roadmapService.updateRoadmap(roadmapDetails, uid);
         res.status(200).json(updatedRoadmap);
     } catch (error) {
         console.error('Error updating roadmap:', error);

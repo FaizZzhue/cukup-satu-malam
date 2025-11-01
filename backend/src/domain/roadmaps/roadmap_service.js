@@ -1,10 +1,12 @@
 const roadmapRepository = require('./roadmap_repository');
+const gemini = require('../../api/gemini/gemini');
 
 async function getRoadmapById(uid) {
     return await roadmapRepository.getRoadmapById(uid);
 }
 
-async function createRoadmap(roadmapData, uid) {
+async function createRoadmap(uid) {
+    const roadmapData = await gemini.generateRoadmap(uid);
     return await roadmapRepository.createRoadmap(roadmapData, uid);
 }
 

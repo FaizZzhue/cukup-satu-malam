@@ -6,9 +6,11 @@ class Roadmap {
         this.updatedAt = updatedAt || new Date();
     }
 
-    static fromFirebase(roadmapRecord) {
+    static fromFirebase(roadmapDoc) {
+        const uid = roadmapDoc.id;
+        const roadmapRecord = roadmapDoc.data() || {};
         return new Roadmap(
-            roadmapRecord.id,
+            uid,
             roadmapRecord.roadmapDetails || [],
             roadmapRecord.createdAt ? roadmapRecord.createdAt.toDate() : new Date(),
             roadmapRecord.updatedAt ? roadmapRecord.updatedAt.toDate() : new Date()

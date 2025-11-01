@@ -1,6 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const roadmapController = require('../../domain/roadmaps/roadmap_controller');
+const { authenticate } = require('../../middlewares/auth_middleware');
+
+router.use(authenticate);
 
 router.get('/:id', async (req, res) => {
     await roadmapController.getRoadmapById(req, res);

@@ -1,4 +1,5 @@
 const userService = require('../../domain/users/user_service');
+const roadmapService = require('../../domain/roadmaps/roadmap_service');
 const apiKey = process.env.GEMINI_API_KEY;
 
 let ai;
@@ -43,7 +44,15 @@ async function generateRoadmap(uid) {
             contents: prompt,
         });
 
-        return answer.text;
+        var roadmapsData = answer.text.split("<ENDL>");
+        var cleanedRoadmaps = [];
+        for (let i = 0; i < roadmapsData.length; i++) {
+            if (roadmapsData[i].trim() !== "") {
+                cleanedRoadmaps.push(roadmapsData[i].trim());
+            }
+        }
+
+        return cleanedRoadmaps;
     } catch (error) {
         console.error('Error generating roadmap:', error);
         throw error;
